@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1d27"/>
+      <stop offset="100%" stop-color="#0f1117"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c6af7"/>
+      <stop offset="100%" stop-color="#5ba3f5"/>
+    </linearGradient>
+  </defs>
+  <!-- background rounded rect -->
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <!-- hexagon brain symbol -->
+  <polygon points="32,8 48,17.5 48,36.5 32,46 16,36.5 16,17.5"
+           fill="none" stroke="url(#accent)" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- inner circuit nodes -->
+  <circle cx="32" cy="27" r="3" fill="url(#accent)"/>
+  <line x1="32" y1="24" x2="32" y2="17" stroke="#7c6af7" stroke-width="1.5" stroke-opacity="0.7"/>
+  <line x1="32" y1="30" x2="22" y2="36" stroke="#7c6af7" stroke-width="1.5" stroke-opacity="0.7"/>
+  <line x1="32" y1="30" x2="42" y2="36" stroke="#7c6af7" stroke-width="1.5" stroke-opacity="0.7"/>
+  <circle cx="32" cy="15" r="2" fill="#9b8afb" fill-opacity="0.8"/>
+  <circle cx="21" cy="37" r="2" fill="#5ba3f5" fill-opacity="0.8"/>
+  <circle cx="43" cy="37" r="2" fill="#5ba3f5" fill-opacity="0.8"/>
+  <!-- bottom label dots -->
+  <circle cx="24" cy="55" r="1.5" fill="#7c6af7" fill-opacity="0.5"/>
+  <circle cx="32" cy="55" r="1.5" fill="#7c6af7" fill-opacity="0.8"/>
+  <circle cx="40" cy="55" r="1.5" fill="#7c6af7" fill-opacity="0.5"/>
+</svg>

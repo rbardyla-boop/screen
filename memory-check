@@ -1,0 +1,61 @@
+#!/bin/bash
+# memory-check — one-command daily entrypoint for the only part of the system that actually matters.
+#
+# This is the single command you should have muscle memory for.
+# It runs the guard first (will hard fail on violations), then regenerates the Unfinished Work Dashboard.
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+cd "$SCRIPT_DIR"
+
+echo "=== MEMORY CHECK (ruthless mode) ==="
+echo "Date: $(date)"
+echo
+
+# Load environment variables from .env (critical for cron)
+if [ -f ".env" ]; then
+    set -a
+    source .env
+    set +a
+fi
+
+# Activate venv if it exists
+if [ -d ".venv" ]; then
+    source .venv/bin/activate
+elif [ -d "venv" ]; then
+    source venv/bin/activate
+fi
+
+echo "[1/5] Running vault guard (CRITICAL violations will abort; warnings will not)..."
+python vault_guard.py --enforce || { code=$?; [ $code -ge 2 ] && { echo "ABORT: critical vault violations. Fix before proceeding."; exit 2; }; echo "  (warnings noted — continuing)"; }
+
+echo
+echo "[2/5] Regenerating Unfinished Work Dashboard..."
+python vault_intelligence.py gaps --scope Memory
+
+echo
+echo "  Auto-linking up to 3 orphaned Memory notes (reduces 98%-orphan problem over time)..."
+python vault_intelligence.py auto-link-orphans --scope Memory --max 3 || echo "  (auto-link skipped)"
+
+echo
+echo "[3/5] Running full Daily Memory Synthesis (today's activity + outstanding tasks + paths forward)..."
+python daily-memory-synthesis.py
+
+echo
+echo "[4/5] Refreshing Swarm Colony Dashboard (skill fitness + pheromone trails)..."
+python vault_intelligence.py swarm-dashboard
+
+echo
+echo "[5/5] Quick sanity on the sacred surface:"
+echo "Memory/ size:"
+du -sh "$VAULT_PATH/Memory" 2>/dev/null || echo "  (VAULT_PATH not set in this shell — check .env)"
+
+echo
+echo "=== DONE ==="
+echo "Open these three in order:"
+echo "  1. Memory/Daily Reviews/$(date +%Y-%m-%d).md   ← today's synthesis with tasks + paths"
+echo "  2. Memory/Unfinished Work Dashboard.md"
+echo "  3. Memory/Swarm-Dashboard.md                   ← colony state: skill fitness + evaporation"
+echo
+echo "This is the memory place you asked for."
