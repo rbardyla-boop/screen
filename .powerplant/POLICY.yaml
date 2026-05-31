@@ -1,0 +1,45 @@
+projectId: Screenpipe-to-Obsidian-c1b44d96
+
+# v0.2.11 code-write dogfood: confirm the newline-escape guard does not
+# false-positive on a legitimate multi-line Python write. The agent writes ONE
+# new test file (real multi-line code); product modules stay read-only.
+
+includePaths:
+  - '**/*.py'
+  - tests/**
+  - requirements*.txt
+  - .powerplant/**
+
+excludePaths:
+  - '**/.git/**'
+  - '**/node_modules/**'
+  # Secrets — real .env present in this repo
+  - .env
+  - .env.*
+  - '**/*.key'
+  - '**/*.pem'
+  # Python environment and tool caches
+  - '**/.venv/**'
+  - '**/venv/**'
+  - '**/__pycache__/**'
+  - '**/.pytest_cache/**'
+  - '**/.mypy_cache/**'
+  - '**/.ruff_cache/**'
+
+denyIfPresentAfterCopy:
+  - .env
+  - .git
+  - .venv
+
+allowedReadPaths:
+  - '**/*.py'
+  - tests/**
+  - requirements*.txt
+  - .powerplant/POLICY.yaml
+  - .powerplant/VERIFY.yaml
+  - README.md
+
+# Write scope is the new test file only. Product modules are read-only — the
+# agent must not modify any application code during this dogfood.
+allowedWritePaths:
+  - tests/**
