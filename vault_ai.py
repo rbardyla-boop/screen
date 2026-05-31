@@ -112,13 +112,75 @@ def run_link(note_arg: str) -> None:
     print(f"Connections appended to: {note}")
 
 
+def _pdf_to_md(pdf_path: Path) -> str | None:
+    """Extract a PDF and ask the AI to structure it as a literature note.
+
+    Uses pdftotext (poppler) for extraction — no Python PDF dependency required.
+    Returns the Markdown string, or None if extraction fails.
+    """
+    import shutil
+    import subprocess
+
+    pdftotext = shutil.which("pdftotext")
+    if not pdftotext:
+        print(f"  WARN: pdftotext not found — skipping {pdf_path.name}")
+        return None
+
+    try:
+        result = subprocess.run(
+            [pdftotext, "-layout", "-nopgbrk", str(pdf_path), "-"],
+            capture_output=True, text=True, timeout=30,
+        )
+        raw = result.stdout.strip()
+    except Exception as exc:
+        print(f"  ERROR extracting {pdf_path.name}: {exc}")
+        return None
+
+    if not raw:
+        print(f"  WARN: pdftotext returned no text for {pdf_path.name} (scanned PDF?)")
+        return None
+
+    # Feed up to 7 000 chars — enough to cover abstract + intro for most papers
+    excerpt = raw[:7000]
+
+    md = ask_ai(
+        "You are converting a research paper PDF to a clean Obsidian literature note.\n"
+        "Your output must be valid Markdown with YAML frontmatter. Follow this structure exactly:\n\n"
+        "---\n"
+        "title: \"<full paper title>\"\n"
+        "authors: \"<Author1, Author2, ...>\"\n"
+        "year: <YYYY or unknown>\n"
+        "source_pdf: \"" + pdf_path.name + "\"\n"
+        "tags: [literature, research-paper]\n"
+        "---\n\n"
+        "## Abstract\n\n"
+        "<abstract text as a single paragraph>\n\n"
+        "## Key Contributions\n\n"
+        "<3-5 bullet points summarising the paper's main claims and results>\n\n"
+        "## Method Overview\n\n"
+        "<2-4 sentences describing the approach>\n\n"
+        "## Key Results\n\n"
+        "<2-4 bullet points with concrete numbers or findings>\n\n"
+        "## Notes\n\n"
+        "<any details worth flagging — limitations, open questions, connections to other work>\n\n"
+        "---\n\n"
+        "Use only the text below to fill in these sections. "
+        "Do not invent data. If a section cannot be filled, write 'N/A'.\n\n"
+        f"PAPER TEXT:\n{excerpt}"
+    )
+
+    return md
+
+
 def run_inbox_processor() -> None:
     """
-    Process top-level markdown files in 00_Inbox/:
-    - LITERATURE → Memory/Literature/
-    - CONCEPT    → Memory/Permanent/
-    - PROJECT    → appended to Open-Loops.md, then archived
-    - SKIP       → archived without processing
+    Process 00_Inbox/:
+    1. Convert any PDFs → Markdown literature notes (using pdftotext + AI structuring).
+    2. Classify all Markdown files:
+       - LITERATURE → Memory/Literature/
+       - CONCEPT    → Memory/Permanent/
+       - PROJECT    → appended to Open-Loops.md, then archived
+       - SKIP       → archived without processing
     """
     vault = Path(VAULT_PATH)
     inbox = vault / "00_Inbox"
@@ -130,16 +192,40 @@ def run_inbox_processor() -> None:
     processed_dir = inbox / "Processed"
     processed_dir.mkdir(exist_ok=True)
 
+    # ── phase 1: PDF → Markdown ────────────────────────────────────────────────
+    pdf_files = [
+        f for f in inbox.iterdir()
+        if f.is_file() and f.suffix.lower() == ".pdf"
+    ]
+
+    if pdf_files:
+        print(f"Found {len(pdf_files)} PDF(s) — extracting to Markdown…\n")
+
+    for pdf in pdf_files:
+        print(f"  {pdf.name}")
+        md_content = _pdf_to_md(pdf)
+        if md_content:
+            md_dest = inbox / (pdf.stem + ".md")
+            md_dest.write_text(md_content, encoding="utf-8")
+            print(f"  → Written: {md_dest.name}")
+            # archive the source PDF so it isn't processed again
+            pdf.rename(processed_dir / pdf.name)
+            print(f"  → PDF archived to Processed/")
+        else:
+            print(f"  → Skipped (could not extract text)")
+        print()
+
+    # ── phase 2: classify Markdown files ──────────────────────────────────────
     md_files = [
         f for f in inbox.iterdir()
         if f.is_file() and f.suffix == ".md" and not _should_skip_path(f, vault)
     ]
 
     if not md_files:
-        print("No markdown files in 00_Inbox/ to process.")
+        print("No markdown files in 00_Inbox/ to classify.")
         return
 
-    print(f"Found {len(md_files)} file(s) in 00_Inbox/\n")
+    print(f"Classifying {len(md_files)} markdown file(s)…\n")
     loops_path = vault / "Memory" / "Open-Loops.md"
 
     for md in md_files:
