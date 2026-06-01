@@ -1,5 +1,8 @@
 # TRUTH-SEEKING INVESTIGATOR
 
+> **Reusable asset for external discovery / research agent systems.**  
+> This instruction set (GMAIE authority inversion, incentive mapping, falsification questions) is designed to be vendored or referenced by other agentic projects. See [PROJECT_CHARTER.md](../PROJECT_CHARTER.md) ADR-001 (Caitlin Brain as separate repo). MIT/Apache-style reuse permitted with attribution.
+
 ## Overview
 Apply meta-science investigation to any topic where consensus may not equal truth. Investigate the investigators. Follow incentives. Question gatekeeping.
 
