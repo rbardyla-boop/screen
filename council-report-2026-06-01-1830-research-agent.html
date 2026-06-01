@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LLM Council — Autonomous Clipping-Research Agent (Pre-Mortem)</title>
+<style>
+  :root{
+    --bg:#0f1115; --surface:#171a21; --surface-2:#1e222b; --line:#2a2f3a;
+    --text:#e7e9ee; --muted:#9aa3b2; --accent:#7c9cff; --warn:#ffb454; --good:#6fcf97; --bad:#ff6b6b;
+    --radius:14px; --maxw:860px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#0c0e12,#0f1115 240px);color:var(--text);line-height:1.55}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:40px 22px 80px}
+  .kicker{letter-spacing:.18em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:clamp(1.7rem,1rem+3vw,2.5rem);line-height:1.1;margin:.3em 0 .2em}
+  .q{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--radius);padding:18px 20px;margin:22px 0;color:var(--muted);font-size:.96rem}
+  .q b{color:var(--text)}
+  h2{font-size:1.15rem;margin:34px 0 8px;display:flex;align-items:center;gap:.5em}
+  h2 .dot{width:9px;height:9px;border-radius:50%}
+  .verdict{background:linear-gradient(135deg,#1b2233,#171a21);border:1px solid #2c3550;border-radius:var(--radius);padding:8px 24px 22px;margin-top:8px}
+  .verdict h3{margin:20px 0 6px;font-size:1rem;color:var(--accent)}
+  .verdict p{margin:.3em 0;color:#cfd5e0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;margin-left:6px;vertical-align:middle}
+  .pill.no{background:rgba(255,107,107,.14);color:var(--bad);border:1px solid rgba(255,107,107,.35)}
+  .pill.do{background:rgba(111,207,151,.15);color:var(--good);border:1px solid rgba(111,207,151,.35)}
+  .grid{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
+  @media(min-width:640px){.grid{grid-template-columns:repeat(5,1fr)}}
+  .advisor{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.82rem}
+  .advisor .name{font-weight:700;font-size:.8rem;margin-bottom:4px}
+  .advisor .stance{color:var(--muted);font-size:.76rem}
+  .spectrum{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:14px 0}
+  .bar{position:relative;height:8px;border-radius:999px;background:linear-gradient(90deg,var(--good),#3a4a6a 55%,var(--bad));margin:30px 0 8px}
+  .bar .node{position:absolute;top:-4px;width:16px;height:16px;border-radius:50%;background:#fff;transform:translateX(-50%);border:3px solid var(--accent)}
+  .bar .tick{position:absolute;top:-26px;transform:translateX(-50%);font-size:.72rem;color:var(--muted);white-space:nowrap}
+  .ends{display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted);margin-top:6px}
+  details{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin:8px 0;padding:0 16px}
+  details[open]{background:var(--surface-2)}
+  summary{cursor:pointer;padding:14px 0;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center}
+  summary::-webkit-details-marker{display:none}
+  summary .tag{font-size:.72rem;color:var(--muted);font-weight:400}
+  details .body{padding:0 0 16px;color:#cfd5e0;font-size:.92rem}
+  .review{border-top:1px dashed var(--line);padding-top:10px;margin-top:6px}
+  .agree{color:var(--good)} .clash{color:var(--warn)} .blind{color:var(--bad)}
+  code{background:#0c0e12;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.85em}
+  footer{margin-top:46px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">LLM Council · Pre-Mortem · 5 advisors · anonymized peer review</div>
+  <h1>Should the brain autonomously research my clippings?</h1>
+  <div class="q">
+    <b>The desire:</b> "Investigate/research the topics in my clippings over time, in off-hours — do something with the articles &amp; resources that just sit there; sometimes they might connect to something."
+    <br><br><b>The stakes:</b> ~89 saved notes that go dormant after filing; a free local model + idle off-hours compute; an existing forward-only connections engine — versus a <b>48GB bloat death</b> (external fetch is the bloat vector) and a habit of <b>abandoning ambitious tools</b>.
+  </div>
+
+  <h2><span class="dot" style="background:var(--accent)"></span>The five advisors</h2>
+  <div class="grid">
+    <div class="advisor"><div class="name">Contrarian</div><div class="stance">Displacement behavior. 48GB was <b>processing debt</b>. Research adds debt; output goes unread → corpse.</div></div>
+    <div class="advisor"><div class="name">First Principles</div><div class="stance">You don't want research — you want to stop feeling <b>guilty</b>. Triage: "is this still load-bearing?"</div></div>
+    <div class="advisor"><div class="name">Expansionist</div><div class="stance">Your <b>intellectual autobiography</b> / a latent book; nightly synthesis-as-first-draft. <i>(unanimous blind spot)</i></div></div>
+    <div class="advisor"><div class="name">Outsider</div><div class="stance">89 unread = a <b>filing habit</b>. A nightly report is a 90th unread thing. Fix the <b>input</b>, not the output.</div></div>
+    <div class="advisor"><div class="name">Executor</div><div class="stance"><code>run_resurface()</code> ~40-line diff. Local model only. <b>No web fetch.</b> Wire into the existing nightly operator.</div></div>
+  </div>
+
+  <h2><span class="dot" style="background:var(--warn)"></span>Where they landed</h2>
+  <div class="spectrum">
+    <div style="font-size:.82rem;color:var(--muted);margin-bottom:6px">Should "research" reach outside the vault?</div>
+    <div class="bar">
+      <div class="node" style="left:20%"></div>
+      <div class="tick" style="left:20%">4 advisors + all 5 reviewers ▼</div>
+    </div>
+    <div class="ends"><span>◀ Internal only — connect/triage what's saved (local model)</span><span>External web research → vault ▶</span></div>
+    <p style="font-size:.82rem;color:var(--muted);margin-top:14px">Lone voice at the right edge: the Expansionist. Reviewers: strongest = Executor (B, 4/5); biggest blind spot = Expansionist (D, <b>5/5</b>) — "the most seductive path back to 48GB."</p>
+  </div>
+
+  <h2><span class="dot" style="background:var(--good)"></span>Council Verdict</h2>
+  <div class="verdict">
+    <h3>Where the council agrees</h3>
+    <p><b>No external web fetch</b> (4/5 advisors + every reviewer) — it's the literal bloat vector. <b>Local model only</b> (free; no unattended-cron cost runaway). The problem is <b>processing debt / write-only accumulation</b>, not a lack of research. Don't generate a new pile of reports nobody reads.</p>
+    <h3>Where it clashes</h3>
+    <p>Expansionist's "autonomous synthesis / latent book" vs everyone — resolved <b>against</b> (unanimous: the rationalization that rebuilds the tar pit). Then Executor's new <code>Resurface-DATE.md</code> vs "no new output" — resolved by a reviewer's insight: <b>keep the mechanism, change the output</b> → write the connection <b>in-place</b> on the note + ride the one best hit on a channel that already reaches you.</p>
+    <h3>Blind spots the peer review caught</h3>
+    <p>(1) <b>Verify the existing</b> connections/nightly output is actually read before adding a loop, or it's another corpse. (2) Write enrichment <b>in-place</b>, not as new files — avoid the "write-only brain." (3) <b>Capture-side friction</b> may be the higher-leverage lever.</p>
+    <h3>The recommendation <span class="pill no">NOT a research agent</span> <span class="pill do">a bounded Librarian</span></h3>
+    <p>Build the <b>Off-Hours Librarian</b>: a nightly, local-model-only pass that reverses the connections mtime filter to find the single strongest link between a <b>dormant</b> clipping and your <b>active</b> work, writes a one-line verdict <b>in-place</b> on the dormant note (<code>🔗 resurfaced — connects to [[active]] · relevant? / resolved / orphaned</code>), and feeds the ONE best hit into the <b>Morning Brief that already pushes to your phone</b>. No external fetch, no new report files, no cloud, guard-gated, corpus size stays flat. Reuses <code>run_connections</code> + the delivery you already have — not a new subsystem.</p>
+    <h3>The one thing to do first</h3>
+    <p><b>Prove the channel before building the engine.</b> Add one "dormant clipping that connects to today's work" line to the existing brief, generated nightly by the local model. If within 2–3 weeks you act on even one resurfaced clipping, expand. If not, the desire was about guilt — and the answer is friction at <b>capture</b>, not a research engine.</p>
+  </div>
+
+  <h2><span class="dot" style="background:#888"></span>Full advisor responses</h2>
+  <details><summary>The Contrarian <span class="tag">processing debt</span></summary><div class="body">The desire is a displacement behavior — fetching new info instead of processing what you have. The 48GB death was a processing-debt problem, not storage; autonomous research adds debt faster than you clear it and the output goes unread → corpse. Local models on research tasks produce confident nonsense → ghost citations corrupt your own memory. "Serendipitous resurfacing" already half-exists in the connections engine and isn't maxed. The version that earns its right is NOT research: a weekly digest of which Literature notes have ZERO connections after 30 days. Force the bottleneck into view; make the human process before the machine generates.</div></details>
+  <details><summary>The First Principles Thinker <span class="tag">it's guilt, not research</span></summary><div class="body">The user doesn't want research — they want to stop feeling guilty about saved things. Every clipping is a broken promise; research generates MORE content around it. Reframe: not "research this topic?" but "is this clipping still load-bearing?" First version: zero fetch, zero new content; one weekly local-model call per clipping comparing its core claim against Open-Loops + recent notes → a verdict (still relevant / resolved / orphaned) as a tag + one sentence. No new notes. Close the loop on why it was saved.</div></details>
+  <details><summary>The Expansionist <span class="tag">bold dissent · unanimous blind spot</span></summary><div class="body">The undervalued upside: this quietly assembles your intellectual autobiography — a latent book. Every clipping was a vote; cross-pollinated nightly by the free local model, they reveal chapter structures you never consciously assembled. "Synthesis-as-first-draft": wake to a 400-word synthesis of three notes that cohere. Compounding personal insight; the corpus is irreproducible = the moat. <i>(Reviewers, 5/5: a hope, not a design — no stopping condition, no success metric, no mechanism to prevent the 48GB death; the exact rationalization that produced the prior bloat.)</i></div></details>
+  <details><summary>The Outsider <span class="tag">fix the input</span></summary><div class="body">89 unread articles = a filing habit, not a learning habit. An AI that reads them and sends nightly reports is just a 90th thing you won't read. When two articles "connect," you feel briefly interested, file it, nothing changes. The night-research idea solves for the feeling of being on top of material, not using it. Real fix: friction on INPUT — delete one to save one; or force one article/week to the top of the screen, write one sentence before you can dismiss it. Ask why you save things you don't read.</div></details>
+  <details><summary>The Executor <span class="tag">strongest · 4/5</span></summary><div class="body">Add <code>run_resurface()</code> to vault_ai.py modeled on the existing <code>run_connections()</code>, but sort by oldest mtime (most dormant), take the bottom ~20, ask the local model which connect to recently-touched notes. Use ollama gemma3:12b only (free, 128k ctx; a cloud model in an unattended cron at $0.05/run is dangerous). Skip external fetch — you have 89 notes you've never connected; that IS the research. Wire into the existing nightly operator (no new cron). ~40-line diff. Resurface first; internet later.</div></details>
+  <details><summary>Peer review highlights <span class="tag">5 reviewers</span></summary><div class="body">
+    <div class="review"><span class="agree">Strongest (4/5):</span> Executor (B) — the only concrete, bounded, infrastructure-reusing proposal with hard scope limits. (1 vote: Contrarian's zero-connection gate.)</div>
+    <div class="review"><span class="blind">Biggest blind spot (5/5):</span> Expansionist (D) — aspiration with no failure mode; the rationalization that rebuilt the tar pit.</div>
+    <div class="review"><span class="clash">Missed by everyone:</span> verify the existing autonomous output is read before adding a loop; write enrichment in-place (not new files) to avoid a write-only brain; capture-side friction may be higher-leverage.</div>
+  </div></details>
+
+  <footer>Counciled 2026-06-01 18:30 · the pre-mortem ADR-001 required before any autonomous research. Method: 5 advisor sub-agents → anonymized A–E → 5 peer reviewers → chairman synthesis. Transcript: <code>council-transcript-2026-06-01-1830-research-agent.md</code>.</footer>
+</div>
+</body>
+</html>

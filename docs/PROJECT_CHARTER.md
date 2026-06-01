@@ -34,3 +34,18 @@ A personal memory prosthetic for one validated failure mode: **"I start ambitiou
 **Salvaged from the dissent.** The Expansionist's causal engine was rejected as the "seductive path to another abandoned tool," but its one zero-ML, high-signal sliver — **ranking by staleness (time-since-touch)** — is adopted as the brief's ordering. It is a "this loop is about to die" signal computed from data that already exists.
 
 **Also recorded:** the uncommitted `vault_guard.py` change (exempting `.claude/` tool-config trees from the directory-*name* toxic check while keeping size/extension/total checks) is a sound narrowing and should be committed so the guard stops drifting.
+
+---
+
+## ADR-002 — 2026-06-01 — Autonomous external clipping-research is rejected; Librarian deferred
+
+**Status:** Accepted (decision only — no code authorized yet). **Method:** LLM Council pre-mortem (5 advisors + 5 anonymized peer reviewers): `council-report-2026-06-01-1830-research-agent.html`, `council-transcript-2026-06-01-1830-research-agent.md`. This is the pre-mortem ADR-001 required before any autonomous research.
+
+**Context.** The user asked whether the brain should "research the topics in my clippings over time in off-hours" and "do something with the resources that just sit there." Today clippings flow Inbox → `run_inbox_processor` → `Memory/Literature/` (62) / `Memory/Permanent/` (27); `run_connections` links only *recently-modified* notes (forward-only — dormant clippings are never revisited).
+
+**Decision.**
+- **REJECTED — do not build:** any process that fetches **external web content** to "research" topics and writes it into the vault. This is the literal mechanism of the 2026-05-28 48GB death. 4/5 advisors + every reviewer rejected it; the "intellectual-autobiography / latent-book" framing was the unanimous blind spot ("the rationalization that rebuilt the tar pit"). If external research is ever revisited, it must land in a size-capped airlock (never `Memory/`), guard-enforced, with its own pre-mortem.
+- **RECOMMENDED — deferred until explicitly authorized:** the **Off-Hours Librarian** — a nightly, **local-model-only** pass that reverses the `connections` mtime filter to find the strongest link between a *dormant* clipping and *active* work, writes a one-line verdict **in-place on the note** (not a new report file), and surfaces the single best hit through the existing Morning Brief. No external fetch, no cloud, guard-gated, corpus size stays flat. Reuses `run_connections` + the brief — not a new subsystem.
+- **Open question to validate first:** whether existing autonomous output (`Connections-*.md`, nightly operator) is actually read. If not, the higher-leverage lever is capture-side friction, not enrichment.
+
+**Consequence.** User chose to stop at the verdict (2026-06-01). No `run_resurface` / Librarian code exists. Guardrail stands: external-content-into-`Memory/` is forbidden.
