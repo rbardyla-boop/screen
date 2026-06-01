@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 """
-vault_export.py — Institutional Vulnerability mitigation
-Serializes the entire Memory/ layer into a clean, portable, re-importable format.
+vault_export.py — Institutional Vulnerability mitigation + Agent Integration
+
+Serializes the Memory/ layer into portable formats.
 
 Usage:
-    python vault_export.py                  # export to default location
-    python vault_export.py --output ~/Backups/Memory-Export-2026-05-31.tar.gz
+    python vault_export.py                                    # normal tar.gz export
+    python vault_export.py --output ~/Backups/Memory-Export-2026-06-01.tar.gz
+
+    # New: Structured export for AI agents (open loops, guardrails, memory classes as native data)
+    python vault_export.py --structured
+    python vault_export.py --for-agents --output ~/Backups/vault-for-agents.json
+
+The --structured / --for-agents flag produces a rich JSON snapshot that external
+discovery agents (e.g. caitlin-brain) can consume as first-class primitives
+instead of raw text. This is the bridge for deeper architectural integration.
 """
 
 import argparse
@@ -45,16 +54,28 @@ def export_memory(vault: Path, output_path: Path | None = None) -> Path:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Export Memory/ layer for redundancy")
+    parser = argparse.ArgumentParser(description="Export Memory/ layer (and optionally structured primitives for AI agents)")
     parser.add_argument("--output", type=Path, help="Custom output path (.tar.gz)")
+    parser.add_argument(
+        "--structured", "--for-agents", action="store_true",
+        help="Also (or only) export a rich JSON snapshot of open loops, guardrails, and memory class policies for AI agents"
+    )
     args = parser.parse_args()
 
     try:
-        export_path = export_memory(VAULT_PATH, args.output)
-        print("\nFalsification test ready:")
-        print("   1. Delete or rename Memory/ folder")
-        print("   2. Extract the .tar.gz")
-        print("   3. Verify all notes, skills, dashboards, and structure are intact")
+        if args.structured:
+            from vault_primitives import export_structured_for_agents
+            out = export_structured_for_agents(VAULT_PATH)
+            print(f"\n✅ Structured agent export ready: {out}")
+            print("   This is the preferred format for deep integration with caitlin-brain / external agents.")
+
+        if not args.structured or args.output:
+            export_path = export_memory(VAULT_PATH, args.output)
+            print("\nFalsification test ready:")
+            print("   1. Delete or rename Memory/ folder")
+            print("   2. Extract the .tar.gz")
+            print("   3. Verify all notes, skills, dashboards, and structure are intact")
+
     except Exception as e:
         print(f"❌ Export failed: {e}")
         exit(1)

@@ -48,6 +48,25 @@ See [design/SCOPED_VISION.md](design/SCOPED_VISION.md) and [design/MENTAL_MODELS
 
 **See also:** Full plan in the originating session (`plan.md`), user vision query, Semantic Scholar API facts (rate limits, `embedding.specterv2`, fields), and the locked SCOPED_VISION.md.
 
+### ADR-002: Deep Architectural Integration with External Discovery Agents (2026-06)
+**Decision:** The vault’s core invariants — Open Loops (with evaporating logic), Guardrails, MemoryClass policies, and anti-bloat enforcement — will be treated as **first-class, native primitives** that external AI agents (in the separate caitlin-brain project) must understand, query, and respect at the architectural level, not merely as text in context packs.
+
+**Rationale:**
+- The highest-leverage signal this system produces is not raw notes, but the explicit, battle-tested machinery the user has built to fight their own cognitive failure modes.
+- Treating these structures as native concepts in agent reasoning (instead of hoping the LLM rediscovers them via RAG) is the natural extension of the Caitlin/Weinstein philosophy already embedded in this project.
+- This direction was selected after evaluating shallower integration options. It represents the most ambitious but highest-alignment path (see conversation record for options A–D).
+
+**Consequences:**
+- New module `vault_primitives.py` defines machine-readable models (`OpenLoop`, `Guardrail`, `MemoryClassPolicy`, `VaultPolicySnapshot`).
+- Future exports (beyond simple tar.gz) will produce structured, agent-optimized representations of these primitives.
+- The caitlin-brain project is expected to consume these primitives natively (enforcement during planning, prioritization, and analogical teleportation).
+- This does **not** expand the locked scope of memcore ingestion or guardrails themselves — it only exposes them more powerfully to authorized external agents.
+- Any agent that violates or ignores these primitives when given access is considered misaligned by design.
+
+**Status:** In progress. Foundational primitives module created. Structured agent export and enforcement layers in caitlin-brain are next.
+
+**Pre-Mortem consideration:** This increases the value (and therefore the blast radius) of the personal vault. It reinforces, rather than weakens, the need for the existing ruthless guardrails and narrow scope.
+
 ---
 
 ## Invariants (Non-Negotiable)
