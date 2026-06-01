@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LLM Council — Second Brain 2.0</title>
+<style>
+  :root{
+    --bg:#0f1115; --surface:#171a21; --surface-2:#1e222b; --line:#2a2f3a;
+    --text:#e7e9ee; --muted:#9aa3b2; --accent:#7c9cff; --warn:#ffb454; --good:#6fcf97; --bad:#ff6b6b;
+    --radius:14px; --maxw:860px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#0c0e12,#0f1115 240px);color:var(--text);line-height:1.55}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:40px 22px 80px}
+  .kicker{letter-spacing:.18em;text-transform:uppercase;font-size:12px;color:var(--accent);font-weight:700}
+  h1{font-size:clamp(1.8rem,1rem+3vw,2.7rem);line-height:1.1;margin:.3em 0 .2em}
+  .q{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
+     border-radius:var(--radius);padding:18px 20px;margin:22px 0;color:var(--muted);font-size:.98rem}
+  .q b{color:var(--text)}
+  h2{font-size:1.15rem;margin:34px 0 8px;display:flex;align-items:center;gap:.5em}
+  h2 .dot{width:9px;height:9px;border-radius:50%}
+  .verdict{background:linear-gradient(135deg,#1b2233,#171a21);border:1px solid #2c3550;border-radius:var(--radius);padding:8px 24px 22px;margin-top:8px}
+  .verdict h3{margin:20px 0 6px;font-size:1rem;color:var(--accent)}
+  .verdict p{margin:.3em 0;color:#cfd5e0}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;margin-left:6px;vertical-align:middle}
+  .pill.do{background:rgba(111,207,151,.15);color:var(--good);border:1px solid rgba(111,207,151,.35)}
+  .grid{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
+  @media(min-width:640px){.grid{grid-template-columns:repeat(5,1fr)}}
+  .advisor{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.82rem}
+  .advisor .name{font-weight:700;font-size:.8rem;margin-bottom:4px}
+  .advisor .stance{color:var(--muted);font-size:.76rem}
+  .spectrum{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:14px 0}
+  .bar{position:relative;height:8px;border-radius:999px;background:linear-gradient(90deg,var(--good),#3a4a6a 50%,var(--warn));margin:30px 0 8px}
+  .bar .tick{position:absolute;top:-26px;transform:translateX(-50%);font-size:.72rem;color:var(--muted);white-space:nowrap}
+  .bar .node{position:absolute;top:-4px;width:16px;height:16px;border-radius:50%;background:#fff;transform:translateX(-50%);border:3px solid var(--accent)}
+  .ends{display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted);margin-top:6px}
+  details{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin:8px 0;padding:0 16px}
+  details[open]{background:var(--surface-2)}
+  summary{cursor:pointer;padding:14px 0;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center}
+  summary::-webkit-details-marker{display:none}
+  summary .tag{font-size:.72rem;color:var(--muted);font-weight:400}
+  details .body{padding:0 0 16px;color:#cfd5e0;font-size:.92rem}
+  .review{border-top:1px dashed var(--line);padding-top:10px;margin-top:6px}
+  .agree{color:var(--good)} .clash{color:var(--warn)} .blind{color:var(--bad)}
+  footer{margin-top:46px;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:16px}
+  code{background:#0c0e12;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.85em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">LLM Council · 5 advisors · anonymized peer review · chairman synthesis</div>
+  <h1>Second Brain 2.0 — what to actually build</h1>
+  <div class="q">
+    <b>The decision:</b> The user wants "the most cutting-edge second brain we can make — the upgraded 2.0."
+    The system is a Python toolchain recording screen+audio 24/7 into an Obsidian <code>Memory/</code> core,
+    fighting one failure mode: <i>"I start ambitious things and forget they exist."</i> It nearly died in a
+    48GB bloat event and was rebuilt around ruthless anti-bloat. A second, meta failure mode looms:
+    <b>this user also abandons ambitious tools</b> — so a sprawling 2.0 is the likeliest way to fail.
+  </div>
+
+  <h2><span class="dot" style="background:var(--accent)"></span>The five advisors</h2>
+  <div class="grid">
+    <div class="advisor"><div class="name">Contrarian</div><div class="stance">"Cutting-edge IS the disease." Kill the Rust rewrite. Tighten the one loop that works.</div></div>
+    <div class="advisor"><div class="name">First Principles</div><div class="stance">It's a <b>delivery</b> problem, not architecture. Push the 3 stalest loops daily.</div></div>
+    <div class="advisor"><div class="name">Expansionist</div><div class="stance">Causal "abandonment fingerprint" — predict project death 3 days early. (The bold dissent.)</div></div>
+    <div class="advisor"><div class="name">Outsider</div><div class="stance">A louder alarm beats an AI layer. Do you even run the system you have?</div></div>
+    <div class="advisor"><div class="name">Executor</div><div class="stance">Ship <code>chromadb</code> vector search this week. (Runner-up; wrong bottleneck.)</div></div>
+  </div>
+
+  <h2><span class="dot" style="background:var(--warn)"></span>Where they landed</h2>
+  <div class="spectrum">
+    <div style="font-size:.82rem;color:var(--muted);margin-bottom:6px">Capability vs. Delivery — where is the real bottleneck?</div>
+    <div class="bar">
+      <div class="node" style="left:22%"></div>
+      <div class="tick" style="left:22%">4 advisors + all 5 reviewers ▼</div>
+    </div>
+    <div class="ends"><span>◀ Delivery / behavior (build less, push harder)</span><span>More capability / ML / Rust ▶</span></div>
+    <p style="font-size:.82rem;color:var(--muted);margin-top:14px">
+      Lone dissent at the right edge: the Expansionist. <b>Unanimous</b> verdict from reviewers:
+      strongest = First Principles (E); biggest blind spot = Expansionist (A) — "the most seductive path to
+      building another abandoned tool."
+    </p>
+  </div>
+
+  <h2><span class="dot" style="background:var(--good)"></span>Council Verdict</h2>
+  <div class="verdict">
+    <h3>Where the council agrees</h3>
+    <p>2.0 is <b>not</b> a cutting-edge rewrite or new ML. The bottleneck is delivery/behavior, not capability or storage.
+       The system already detects everything it needs; it just never reaches the user proactively. <b>Python, not Rust</b> — the Rust "memcore" stays locked and unbuilt.</p>
+    <h3>Where the council clashes</h3>
+    <p><b>Expansionist vs. all.</b> Causal modeling = category-defining moat <i>or</i> the seductive trap. Chairman sides with the majority but salvages the one cheap, non-ML sliver they all share: <b>rank loops by staleness</b> (time-since-touch) — a "this is about to die" signal with zero ML, already in <code>.loop-state.json</code>. The grand causal engine is deferred behind a future pre-mortem.</p>
+    <h3>Blind spots the peer review caught</h3>
+    <p>Nobody checked whether the user <i>runs</i> <code>memory-check</code>; <code>vault_guard.py</code> was drifting uncommitted; and every proposal still required the user to <i>pull</i>. The verdict must be <b>push</b>, must <b>gate on the guard</b>, and must need no babysitting.</p>
+    <h3>The recommendation <span class="pill do">BUILD</span></h3>
+    <p><b>Memory Core 2.0 — the second brain that reaches OUT to you.</b> A small, deterministic <b>Morning Brief</b> that automatically surfaces the 3 stalest open loops — each with age + one concrete next action — delivered as an ambient interrupt (desktop notification + optional phone push), gated by the guard, written to a single overwritten file that never grows. No new store, no ML, no Rust, no new heavy dependency. Reuses the existing gaps engine and <code>.loop-state.json</code>.</p>
+    <h3>The one thing to do first</h3>
+    <p>Write <code>vault_brief.py</code> (TDD): rank live loops by staleness, render a 3-item brief, deliver via a <code>Notifier</code> (stdout + <code>notify-send</code> + optional <code>ntfy</code>), gated by <code>vault_guard</code>, plus opt-in <code>--install-timer</code> (systemd user timer) so it fires every morning with zero user effort.</p>
+  </div>
+
+  <h2><span class="dot" style="background:#888"></span>Full advisor responses</h2>
+  <details><summary>The Contrarian <span class="tag">"cutting-edge is the disease"</span></summary>
+    <div class="body">"Cutting-edge" actively conflicts with the system's one validated job — every new capability is new surface area to abandon. The 48GB bloat came from optimizing completeness over signal. Kill the Rust memcore: big rewrite, delayed payoff, no users. The design doc forbids expansion without a pre-mortem because the author knows they'll scope-creep — the pre-mortem is now, and the answer is don't build it. The highest-leverage move is making the daily ritual frictionless enough that it's actually run. "2.0" = remove code, tighten the one working loop. A new language runtime is failure mode #2 in progress.</div></details>
+  <details><summary>The First Principles Thinker <span class="tag">unanimous strongest</span></summary>
+    <div class="body">The user isn't building a brain — they're outsourcing executive function (closing open loops). "Cutting-edge 2.0" is the problem in disguise: an ambitious upgrade to the anti-abandonment tool. The recursion is diagnostic. The requirement: something reliably tells you daily "you started X and never finished," with no maintenance. That's a notification problem, not architecture. Data is captured, gaps already detected — the gap is delivery. 2.0 = a friction-free daily interrupt surfacing the 3 stalest loops by time-since-touch, impossible to ignore. Python, not Rust. Don't expand capability until the existing capability changes behavior.</div></details>
+  <details><summary>The Expansionist <span class="tag">bold dissent · unanimous blind spot</span></summary>
+    <div class="body">Highest-leverage = causal pattern detection over the lifelog: a "personal abandonment fingerprint" that predicts project death before it happens. Cross-reference death timestamps with screen patterns, time-of-day, audio sentiment → "predictive loop resurrection," surfacing a project 3 days before you'd ghost it. It becomes a "decision mirror" exposing gaps between stated priorities and actual attention. Vector/graph are table stakes; temporal causal modeling is the moat — scope memcore Rust for exactly this. <i>(Reviewers: requires months of ML + labeled ground-truth on "project death" that doesn't exist, and presupposes the user reads the output — the seductive path to another abandoned tool.)</i></div></details>
+  <details><summary>The Outsider <span class="tag">fresh eyes</span></summary>
+    <div class="body">The problem is already solved — 50 notes worked; the constraint is manageability, not data. Every 2.0 feature adds complexity, the opposite of the fix. Open loops = a forgetting-to-check problem. Do you actually run the daily command? A louder alarm beats an AI layer. Recording 24/7 is strange — under 1% is a forgotten project. "Ask my life anything" = confident wrong answers about your own life. What helps: a 2-minute habit to write down what you started. Build 2.0 only after answering why you don't run the system you already have.</div></details>
+  <details><summary>The Executor <span class="tag">runner-up · shippable</span></summary>
+    <div class="body">Rust is a trap (zero code, fantasy backlog). Ship this week: <code>chromadb</code> embedded vector search over the vault — index on write, query — giving semantic recall + RAG now; wire into <code>memory-check</code> so loops surface by similarity; feed the existing AI synthesis "what did I start but not finish?"; add a <code>--query</code> flag. Skip graph/agentic/local-LLM. Retrieval first, then layer. <i>(Reviewers: concrete, but retrieval isn't the bottleneck — loops get ignored, not un-found.)</i></div></details>
+
+  <details><summary>Peer review highlights <span class="tag">5 independent reviewers</span></summary>
+    <div class="body">
+      <div class="review"><span class="agree">Strongest (5/5):</span> First Principles (E) — diagnoses the failure at the right layer and names the recursion trap.</div>
+      <div class="review"><span class="blind">Biggest blind spot (5/5):</span> Expansionist (A) — most technically seductive path to another abandoned tool; needs nonexistent labeled data; presupposes the user reads the output.</div>
+      <div class="review"><span class="clash">Missed by everyone:</span> (1) nobody checked whether <code>memory-check</code> is actually run; (2) <code>vault_guard.py</code> was drifting uncommitted; (3) every proposal still required the user to pull — no concrete push (cron/systemd/notification) existed anywhere in the repo.</div>
+    </div></details>
+
+  <footer>
+    Counciled 2026-06-01 18:04 · question: "make this the most cutting-edge second brain — the 2.0 version, plan and build it."<br>
+    Method: 5 advisor sub-agents (parallel) → anonymized A–E → 5 peer reviewers (parallel) → chairman synthesis.
+    Full transcript: <code>council-transcript-2026-06-01-1804.md</code>.
+  </footer>
+</div>
+</body>
+</html>

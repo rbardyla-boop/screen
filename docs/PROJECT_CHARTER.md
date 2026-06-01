@@ -67,6 +67,27 @@ See [design/SCOPED_VISION.md](design/SCOPED_VISION.md) and [design/MENTAL_MODELS
 
 **Pre-Mortem consideration:** This increases the value (and therefore the blast radius) of the personal vault. It reinforces, rather than weakens, the need for the existing ruthless guardrails and narrow scope.
 
+### ADR-003: Second Brain "2.0" is delivery, not capability — the proactive Morning Brief (2026-06-01)
+
+**Status:** Accepted & shipped. **Method:** LLM Council (5 advisors + 5 anonymized peer reviewers) + mandatory Pre-Mortem (`design/MENTAL_MODELS_2.0_ANALYSIS.md`, `council-report-2026-06-01-1804.html`).
+
+**Decision.** The "2.0" upgrade is *proactive delivery of existing signal*, not new capability. `vault_brief.py` ranks live open loops by staleness (from `Memory/.loop-state.json`), filters heading/scaffolding noise, diversifies across source notes, and pushes the 3 stalest (+ one next action each) via a `Notifier` (stdout + `notify-send` + optional `ntfy` phone push), writing a single overwritten `Memory/Morning-Brief.md` (anti-bloat). Guard-gated; opt-in `--install-timer` (systemd user timer, 07:30). 23 tests (TDD). Wired into `memory-check` as step [6/6]. Python, not Rust — the `memcore` rewrite stays locked.
+
+**Deferred behind a future Pre-Mortem:** causal/temporal ML "abandonment fingerprint", vector/semantic search, RAG "ask my life" Q&A, knowledge-graph visualization, local-LLM-in-critical-path.
+
+**Known duplication to consolidate.** This coexists with `vault_night_operator.py:generate_morning_briefing()` (the cron-6am "connections / pattern / reflection" briefing into `06 - Automation/Morning Briefings/`). They were built on separate tracks and overlap conceptually. Open item: pick one canonical morning surface (likely fold the night operator's connections/reflection sections into the pushed `vault_brief`, so there is a single delivered brief) and one scheduler (systemd timer vs cron).
+
+### ADR-004: Autonomous external clipping-research rejected; Off-Hours Librarian deferred (2026-06-01)
+
+**Status:** Accepted (decision only — no code authorized). **Method:** LLM Council pre-mortem (5 advisors + 5 peer reviewers): `council-report-2026-06-01-1830-research-agent.html`.
+
+**Decision.**
+- **REJECTED — do not build:** any process that fetches **external web content** to "research" clipping topics and writes it into the vault. This is the literal mechanism of the 2026-05-28 48 GB death; 4/5 advisors + every reviewer rejected it (the "intellectual-autobiography / latent-book" framing was the unanimous blind spot). Fully consistent with **ADR-001**: external literature/discovery is a *separate repo that consumes the vault read-only and never writes back*.
+- **RECOMMENDED — deferred until explicitly authorized:** the **Off-Hours Librarian** — a nightly, local-model-only pass that reverses the `connections` mtime filter to surface the strongest link between a *dormant* clipping and *active* work, writes a one-line verdict **in-place on the note** (not a new report file), and feeds the single best hit into the Morning Brief (ADR-003). No external fetch, no cloud, guard-gated, corpus size stays flat.
+- **Validate first:** whether existing autonomous output (`Connections-*.md`, night operator) is actually read; if not, the higher-leverage lever is capture-side friction, not enrichment.
+
+**Consequence.** User chose to stop at the verdict (2026-06-01). No `run_resurface` / Librarian code exists. Guardrail stands: external-content-into-`Memory/` is forbidden.
+
 ---
 
 ## Invariants (Non-Negotiable)

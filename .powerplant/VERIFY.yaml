@@ -1,0 +1,19 @@
+# VERIFY.yaml — checks run as plain subprocesses (no shell, split on whitespace).
+#
+# Code-write dogfood. The required gate is hermetic: it byte-compiles all bundled
+# Python (including the agent's new test file) without executing imports, so it
+# needs neither the excluded .venv nor network. A corrupt single-line escaped
+# write would either be rejected at the write boundary (v0.2.11 guard) or fail
+# compilation here — so a PASS confirms the guard let valid multi-line code
+# through intact.
+
+checks:
+  # Hermetic required gate: syntax-check everything, incl. the new test file.
+  scripts-syntax:
+    command: python3 -m compileall -q .
+    required: true
+
+  # Advisory: running the test needs the project's .venv (excluded from bundle).
+  tests:
+    command: python3 -m pytest tests/ -q
+    required: false

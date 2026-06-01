@@ -27,11 +27,11 @@ elif [ -d "venv" ]; then
     source venv/bin/activate
 fi
 
-echo "[1/5] Running vault guard (CRITICAL violations will abort; warnings will not)..."
+echo "[1/6] Running vault guard (CRITICAL violations will abort; warnings will not)..."
 python vault_guard.py --enforce || { code=$?; [ $code -ge 2 ] && { echo "ABORT: critical vault violations. Fix before proceeding."; exit 2; }; echo "  (warnings noted — continuing)"; }
 
 echo
-echo "[2/5] Regenerating Unfinished Work Dashboard..."
+echo "[2/6] Regenerating Unfinished Work Dashboard..."
 python vault_intelligence.py gaps --scope Memory
 
 echo
@@ -39,23 +39,32 @@ echo "  Auto-linking up to 3 orphaned Memory notes (reduces 98%-orphan problem o
 python vault_intelligence.py auto-link-orphans --scope Memory --max 3 || echo "  (auto-link skipped)"
 
 echo
-echo "[3/5] Running full Daily Memory Synthesis (today's activity + outstanding tasks + paths forward)..."
+echo "[3/6] Running full Daily Memory Synthesis (today's activity + outstanding tasks + paths forward)..."
 python daily-memory-synthesis.py
 
 echo
-echo "[4/5] Refreshing Swarm Colony Dashboard (skill fitness + pheromone trails)..."
+echo "[4/6] Refreshing Swarm Colony Dashboard (skill fitness + pheromone trails)..."
 python vault_intelligence.py swarm-dashboard
 
 echo
-echo "[5/5] Quick sanity on the sacred surface:"
+echo "[5/6] Quick sanity on the sacred surface:"
 echo "Memory/ size:"
 du -sh "$VAULT_PATH/Memory" 2>/dev/null || echo "  (VAULT_PATH not set in this shell — check .env)"
 
 echo
+echo "[6/6] Pushing the proactive Morning Brief (3 stalest open loops + next action)..."
+# Guard already ran in step 1; --skip-guard avoids a redundant audit. Non-fatal:
+# the brief must never block the daily ritual.
+python vault_brief.py --skip-guard || echo "  (morning brief skipped)"
+
+echo
 echo "=== DONE ==="
-echo "Open these three in order:"
-echo "  1. Memory/Daily Reviews/$(date +%Y-%m-%d).md   ← today's synthesis with tasks + paths"
-echo "  2. Memory/Unfinished Work Dashboard.md"
-echo "  3. Memory/Swarm-Dashboard.md                   ← colony state: skill fitness + evaporation"
+echo "Open these in order:"
+echo "  1. Memory/Morning-Brief.md                     ← the 3 stalest loops, pushed to you"
+echo "  2. Memory/Daily Reviews/$(date +%Y-%m-%d).md   ← today's synthesis with tasks + paths"
+echo "  3. Memory/Unfinished Work Dashboard.md"
+echo "  4. Memory/Swarm-Dashboard.md                   ← colony state: skill fitness + evaporation"
+echo
+echo "Tip: run 'python vault_brief.py --install-timer' once to get the brief every morning automatically."
 echo
 echo "This is the memory place you asked for."
