@@ -89,18 +89,26 @@ def find_toxic_items(root: Path, max_depth: int = 4) -> list[dict]:
 
         dirpath_str = str(dirpath) + "/"
 
+        # Claude Code tool-config trees (.claude/) are exempt from the directory-NAME
+        # toxic check: skills legitimately carry slugs like "build"/"dist"/"out", and
+        # Python hooks regenerate __pycache__ on every run. This is tool config, not
+        # knowledge content, so it cannot bloat the vault into a tar pit. Media/model
+        # extension checks and vault-size totals below still apply here.
+        in_claude_config = ".claude" in rel.parts
+
         # Check for toxic directory names
-        for pattern in TOXIC_PATTERNS:
-            if pattern in dirpath_str:
-                findings.append({
-                    "type": "toxic_dir",
-                    "path": str(dirpath),
-                    "reason": f"matches toxic pattern '{pattern}'",
-                    "size": None,
-                })
-                # Don't descend into obvious venvs etc.
-                dirnames[:] = []
-                break
+        if not in_claude_config:
+            for pattern in TOXIC_PATTERNS:
+                if pattern in dirpath_str:
+                    findings.append({
+                        "type": "toxic_dir",
+                        "path": str(dirpath),
+                        "reason": f"matches toxic pattern '{pattern}'",
+                        "size": None,
+                    })
+                    # Don't descend into obvious venvs etc.
+                    dirnames[:] = []
+                    break
 
         # Check for toxic file extensions at this level (sample)
         toxic_files = [f for f in filenames if Path(f).suffix.lower() in TOXIC_EXTENSIONS]
