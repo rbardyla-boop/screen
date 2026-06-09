@@ -52,6 +52,16 @@ TOXIC_PATTERNS = [
     ".cache/",
 ]
 
+# Tool/plugin-managed config trees that live inside the vault but are NOT knowledge
+# content: Claude Code config, Obsidian app config + plugin data, and the Smart
+# Connections embedding store. They hold regenerable tool state, not a tar pit, so
+# they are exempt from the directory-NAME toxic scan. Note: ".smart-env" contains the
+# substring "env/", which would otherwise false-match the venv pattern; a Claude skill
+# slugged "build"/"dist" and a hook's regenerated __pycache__ live here too. Size
+# totals and toxic-extension (media/model) checks still apply everywhere. ".git" is
+# deliberately NOT exempt so .git/objects/ history bloat still fires.
+TOOL_CONFIG_DIRS = {".claude", ".obsidian", ".smart-env", ".claudian", ".trash"}
+
 # File extensions that are almost always wrong in a knowledge vault
 TOXIC_EXTENSIONS = {
     ".mp4", ".mov", ".avi", ".mkv", ".webm",  # video
@@ -89,15 +99,15 @@ def find_toxic_items(root: Path, max_depth: int = 4) -> list[dict]:
 
         dirpath_str = str(dirpath) + "/"
 
-        # Claude Code tool-config trees (.claude/) are exempt from the directory-NAME
-        # toxic check: skills legitimately carry slugs like "build"/"dist"/"out", and
-        # Python hooks regenerate __pycache__ on every run. This is tool config, not
-        # knowledge content, so it cannot bloat the vault into a tar pit. Media/model
-        # extension checks and vault-size totals below still apply here.
-        in_claude_config = ".claude" in rel.parts
+        # Tool/plugin-managed config trees (.claude/, .obsidian/, .smart-env/, ...)
+        # are exempt from the directory-NAME toxic check — see TOOL_CONFIG_DIRS. They
+        # carry regenerable tool state, not knowledge content, so they cannot bloat the
+        # vault into a tar pit. Media/model extension checks and vault-size totals below
+        # still apply here.
+        in_tool_config = bool(TOOL_CONFIG_DIRS.intersection(rel.parts))
 
         # Check for toxic directory names
-        if not in_claude_config:
+        if not in_tool_config:
             for pattern in TOXIC_PATTERNS:
                 if pattern in dirpath_str:
                     findings.append({
